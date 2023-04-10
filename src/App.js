@@ -1,13 +1,15 @@
 
 import './App.css';
+import { useState } from 'react';
+import Main from './components/Main';
 
 function App() {
+ 
   return (
-    <div className="App">
-      <header className="App-header">
-      
-      <h1 style={{background:"red", color:"black"}}>hello</h1>
-      </header>
+    <div className='container'>
+    <Main />
+    
+        
     </div>
   );
 }
