@@ -1,5 +1,5 @@
 import './Checkbox.css'
-export default function (props) {
+export default function CheckBox(props) {
     const {label, value, checked, name, onChange, disabled} = props;
   return (
    

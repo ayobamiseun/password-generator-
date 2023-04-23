@@ -1,14 +1,12 @@
 import "./Slider.css";
 import { useState, useRef } from "react";
 export default function Slider(props) {
+  
   const { step, min, max, value, defaultLength, onChangeValue } = props;
-
   const rangeRef = useRef();
   const [range, setRange] = useState("");
-
   const activeRangeColor = "#4aa1f3";
   const rangeBackground = "#d7dcdf";
-
   function handleChange(max, e) {
     onChangeValue(e);
 
@@ -18,10 +16,9 @@ export default function Slider(props) {
     const newBackground = `linear-gradient(90deg, ${activeRangeColor} 0% ${progress}, ${rangeBackground} ${progress} 100%)`;
     rangeRef.current.style.background = newBackground;
   }
-
-  if(range !== defaultLength || !range) {
-    setRange(defaultLength)
-   }
+  if (range !== defaultLength || !range) {
+    setRange(defaultLength);
+  }
   const progressValue = range;
   const progress = (progressValue / max) * 100 + "%";
   const styleInput = {

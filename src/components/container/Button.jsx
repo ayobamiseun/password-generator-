@@ -10,6 +10,8 @@ export default function Button(props) {
     onClick={handleClick}
     >
       <i className={iconDisplay}></i>
+    
+      <i></i>
     </button>
   )
 }
