@@ -98,6 +98,24 @@ export default function Container({
         return "";
       });
     }
+    else {
+      CHECKBOXLISTS.map(checkbox => {
+        const name = checkbox.name;
+       
+          checkbox.isChecked = true;
+          const checkBoxProps = {
+            name,
+            checkedName: '',
+            checked: false,
+            isChecked: checkbox.isChecked,
+            min: 1,
+            max: 60,
+            length: 12, 
+          };
+          checkBoxProperties(checkBoxProps);
+        
+      });
+    }
   }
   function checkBoxProperties(checkBoxProps) {
     const { name, checked, isChecked, checkedName, min, max, length } =
@@ -127,7 +145,7 @@ export default function Container({
   
   // change the check box on click
   function onChangeCheckBox(e) {
-    if (type !== "pin") {
+    if (!type === "pin") {
       let { name, checked } = e.target;
 
       {
@@ -140,7 +158,7 @@ export default function Container({
           }
         });
       }
-    }
+    } 
   }
   useMemo(updateCheckBoxes, [type]);
   function copyClipBoard(e, elementRef) {
