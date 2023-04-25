@@ -1,9 +1,13 @@
 import Button from "./Button";
 import Slider from "./Slider";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import "./Container.css";
 import CheckBox from "../Checkbox";
-import { generatePassword, setPasswordLength, copyToClipBoard } from "../utils/Helper";
+import {
+  generatePassword,
+  setPasswordLength,
+  copyToClipBoard,
+} from "../utils/Helper";
 const CHECKBOXLISTS = [
   {
     id: 0,
@@ -31,7 +35,13 @@ const CHECKBOXLISTS = [
     isChecked: true,
   },
 ];
-export default function Container({setPasswordDis, setRange, setPasswordProps, passwordRef}) {
+export default function Container({
+  setPasswordDis,
+  setRange,
+  setPasswordProps,
+  passwordRef,
+  type
+}) {
   const [rangeValue, setRangeValue] = useState(12);
   const [Checkbox, setCheckBox] = useState({
     Uppercase: true,
@@ -39,73 +49,116 @@ export default function Container({setPasswordDis, setRange, setPasswordProps, p
     Symbols: true,
     numbers: true,
   });
-  const [checked, setChecked] = useState(false)
-   const [checkedName, setCheckedName] = useState('')
+  const [checked, setChecked] = useState(false);
+  const [checkedName, setCheckedName] = useState("");
+  const [minMaxValue, setMinMaxValue] = useState({
+    min: 1,
+    max: 60
+  });
   const { Uppercase, Lowercase, Symbols, numbers } = Checkbox;
+  const { min, max } = minMaxValue;
   useEffect(() => {
     setPasswordLength(rangeValue);
-    setRange(rangeValue)
+    setRange(rangeValue);
     passwordGenerated(Checkbox, rangeValue);
-       checkboxCount()
+    checkboxCount();
 
     // eslint-disable-next-line
   }, [Uppercase, Lowercase, Symbols, numbers]);
- function checkboxCount() {
-   const checkCount = Object.keys(Checkbox).filter(key => Checkbox[key]);
-   const disabled = checkCount.length === 1;
-   const name =   checkCount[0];
-   if(disabled) {
-    setChecked(disabled)
-    setCheckedName(name)
-   }
-   else {
-    setChecked(false)
-    setCheckedName('')
-   }
- }
+  function checkboxCount() {
+    const checkCount = Object.keys(Checkbox).filter((key) => Checkbox[key]);
+    const disabled = checkCount.length === 1;
+    const name = checkCount[0];
+    if (disabled) {
+      setChecked(disabled);
+      setCheckedName(name);
+    } else {
+      setChecked(false);
+      setCheckedName("");
+    }
+  }
+
+  function updateCheckBoxes() {
+    if (type === "pin") {
+      CHECKBOXLISTS.map(checkbox => {
+        const name = checkbox.name;
+        if (name !== "numbers") {
+          checkbox.isChecked = false;
+          const checkBoxProps = {
+            name,
+            checkedName: name,
+            checked: true,
+            isChecked: checkbox.isChecked,
+            min: 0,
+            max: 15,
+            length: 3, 
+          };
+          checkBoxProperties(checkBoxProps);
+        }
+        return "";
+      });
+    }
+  }
+  function checkBoxProperties(checkBoxProps) {
+    const { name, checked, isChecked, checkedName, min, max, length } =
+      checkBoxProps;
+
+    setCheckBox(prevState => ({ ...prevState, [name]: isChecked }));
+    setChecked(checked);
+    setCheckedName(checkedName);
+    setPasswordLength(length);
+    setMinMaxValue({ min, max });
+    setRangeValue(length);
+    setRange(length);
+  }
+
   function passwordGenerated(Checkbox, rangeValue) {
     const pwd = generatePassword(Checkbox, rangeValue);
     console.log(pwd);
-    setPasswordDis(pwd)
-    setPasswordProps(Checkbox)
+    setPasswordDis(pwd);
+    setPasswordProps(Checkbox);
   }
   function onChangeSlider(e) {
     setRangeValue(e.target.value);
-    setPasswordLength(e.target.value)
-    setRange(e.target.value)
-    passwordGenerated(Checkbox, e.target.value)
+    setPasswordLength(e.target.value);
+    setRange(e.target.value);
+    passwordGenerated(Checkbox, e.target.value);
   }
   
   // change the check box on click
   function onChangeCheckBox(e) {
-    let { name, checked } = e.target;
+    if (type !== "pin") {
+      let { name, checked } = e.target;
 
-    {
-      CHECKBOXLISTS.map((list) => {
-        if (list.name === name) {
-          list.isChecked = checked;
-          setCheckBox(prevState => ({...prevState, [name]: checked }));
-          setPasswordLength(rangeValue)
-          setRangeValue(rangeValue)
-        }
-      });
+      {
+        CHECKBOXLISTS.map((list) => {
+          if (list.name === name) {
+            list.isChecked = checked;
+            setCheckBox((prevState) => ({ ...prevState, [name]: checked }));
+            setPasswordLength(rangeValue);
+            setRangeValue(rangeValue);
+          }
+        });
+      }
     }
   }
-
+  useMemo(updateCheckBoxes, [type]);
   function copyClipBoard(e, elementRef) {
     e.preventDefault();
-    copyToClipBoard(elementRef)
+    copyToClipBoard(elementRef);
   }
-  return (<>
-     <div className=" password-settings">
+
+  return (
+    <>
+      <div className=" password-settings">
         <h3>Use slider to select for options</h3>
         <div className="row">
           <div className="col--md-12">
             <div className="form-group">
               &nbsp;
               <Slider
-                min={1}
-                max={60}
+                min={parseInt(min, 10)}
+                max={parseInt(max, 10)}
                 step={1}
                 defaultLength={parseInt(rangeValue, 10)}
                 value={parseInt(rangeValue, 10)}
@@ -123,8 +176,9 @@ export default function Container({setPasswordDis, setRange, setPasswordProps, p
                   label={list.label}
                   value={list.isChecked}
                   onChange={onChangeCheckBox}
-                  disabled={checked &&  list.isChecked && checkedName === list.name}
-                
+                  disabled={
+                    checked && list.isChecked && checkedName === list.name
+                  }
                 />
               ))}
             </div>
@@ -134,11 +188,14 @@ export default function Container({setPasswordDis, setRange, setPasswordProps, p
         <div className="text-center">
           <div className="row">
             <div className="col-md-12">
-              <Button iconDisplay="far fa-copy" handleClick={(e) =>copyClipBoard(e, passwordRef.current)} />
+              <Button
+                iconDisplay="far fa-copy"
+                handleClick={(e) => copyClipBoard(e, passwordRef.current)}
+              />
             </div>
           </div>
         </div>
       </div>
     </>
-);
+  );
 }
