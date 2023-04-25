@@ -20,7 +20,7 @@ export default function Display() {
   let passwordDescription = "";
 
   function generateNewPassword() {
-    const pwd = generatePassword(passwordProps, rangeValue);
+    const pwd = rangeValue > 3 ?  generatePassword(passwordProps, rangeValue) : generatePassword(passwordProps, 3 );
     setPasswordDis(pwd);
   }
 

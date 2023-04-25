@@ -131,7 +131,8 @@ export default function Container({
   }
 
   function passwordGenerated(Checkbox, rangeValue) {
-    const pwd = generatePassword(Checkbox, rangeValue);
+    const pwd = rangeValue > 3 ? generatePassword(Checkbox, rangeValue) : generatePassword(Checkbox, 3);
+    // const pwd = generatePassword(Checkbox, rangeValue);
     console.log(pwd);
     setPasswordDis(pwd);
     setPasswordProps(Checkbox);
@@ -145,7 +146,7 @@ export default function Container({
   
   // change the check box on click
   function onChangeCheckBox(e) {
-    if (!type === "pin") {
+    if (type !== "pin") {
       let { name, checked } = e.target;
 
       {
